@@ -1,0 +1,1384 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trò Chơi Toán Học - Bé Vui Học Toán</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       GLOBAL RESET & BASE
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', 'Baloo 2', 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #87CEEB 0%, #B8E6C1 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ============================================================
+       FLOATING CLOUDS
+       ============================================================ */
+    .cloud {
+      position: fixed;
+      background: rgba(255,255,255,0.75);
+      border-radius: 50px;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .cloud::before, .cloud::after {
+      content: '';
+      position: absolute;
+      background: rgba(255,255,255,0.75);
+      border-radius: 50%;
+    }
+    .cloud-1 { width: 120px; height: 40px; top: 8%; animation: floatCloud 22s linear infinite; }
+    .cloud-1::before { width: 60px; height: 60px; top: -30px; left: 15px; }
+    .cloud-1::after  { width: 40px; height: 40px; top: -18px; left: 55px; }
+
+    .cloud-2 { width: 90px; height: 30px; top: 18%; animation: floatCloud 30s linear infinite 8s; }
+    .cloud-2::before { width: 45px; height: 45px; top: -22px; left: 10px; }
+    .cloud-2::after  { width: 30px; height: 30px; top: -14px; left: 40px; }
+
+    .cloud-3 { width: 150px; height: 50px; top: 30%; animation: floatCloud 26s linear infinite 3s; }
+    .cloud-3::before { width: 70px; height: 70px; top: -35px; left: 20px; }
+    .cloud-3::after  { width: 50px; height: 50px; top: -22px; left: 70px; }
+
+    .cloud-4 { width: 100px; height: 35px; top: 55%; animation: floatCloud 34s linear infinite 15s; }
+    .cloud-4::before { width: 50px; height: 50px; top: -25px; left: 12px; }
+    .cloud-4::after  { width: 35px; height: 35px; top: -16px; left: 48px; }
+
+    @keyframes floatCloud {
+      0%   { transform: translateX(-220px); }
+      100% { transform: translateX(110vw); }
+    }
+
+    /* ============================================================
+       LAYOUT WRAPPER
+       ============================================================ */
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ============================================================
+       TOP BAR
+       ============================================================ */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      flex-shrink: 0;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #1565C0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-shadow: 0 1px 3px rgba(255,255,255,0.6);
+    }
+    .top-bar-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .top-btn {
+      background: rgba(255,255,255,0.9);
+      border: none;
+      border-radius: 50px;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #1565C0;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      transition: transform 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
+    }
+    .top-btn:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.18); }
+    .top-btn.music-on { background: #FFD600; color: #5D4037; }
+
+    /* ============================================================
+       MAIN CONTENT AREA
+       ============================================================ */
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 0 16px 16px;
+    }
+
+    /* ============================================================
+       SCREENS (fade transition)
+       ============================================================ */
+    .screen {
+      width: 100%;
+      max-width: 720px;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    .screen.active {
+      display: block;
+      opacity: 1;
+    }
+    .screen.fade-in { animation: fadeIn 0.4s ease forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================================
+       MAIN CONTAINER (white card)
+       ============================================================ */
+    .container {
+      background: rgba(255, 255, 255, 0.93);
+      border-radius: 30px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+      padding: 28px 30px 24px;
+      width: 100%;
+    }
+
+    /* ============================================================
+       WELCOME SCREEN
+       ============================================================ */
+    .welcome-emoji-row {
+      text-align: center;
+      font-size: 2.4rem;
+      letter-spacing: 6px;
+      margin-bottom: 14px;
+    }
+    .welcome-title {
+      text-align: center;
+      font-size: 2.3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #FF6B35, #FF0080, #7B2FBE, #1565C0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+    .welcome-subtitle {
+      text-align: center;
+      color: #546E7A;
+      font-size: 0.95rem;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+    .feature-pills {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .pill {
+      background: linear-gradient(135deg, #E3F2FD, #F3E5F5);
+      border-radius: 50px;
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #1565C0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+    }
+    .btn-start { font-family: 'Baloo 2', 'Nunito', sans-serif;
+      display: block;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, #FFD600, #FFA000);
+      color: #5D4037;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.3rem;
+      font-weight: 900;
+      padding: 18px 56px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255,160,0,0.45);
+      transition: transform 0.18s, box-shadow 0.18s;
+      letter-spacing: 1px;
+    }
+    .btn-start:hover { transform: scale(1.06); box-shadow: 0 6px 22px rgba(255,160,0,0.55); }
+    .welcome-age {
+      text-align: center;
+      color: #90A4AE;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+
+    /* ============================================================
+       FLOWER DECORATION
+       ============================================================ */
+    .flowers {
+      text-align: center;
+      font-size: 1.5rem;
+      letter-spacing: 8px;
+      margin-top: 8px;
+      opacity: 0.85;
+    }
+
+    /* ============================================================
+       QUESTION SCREEN
+       ============================================================ */
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .question-number {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #1565C0;
+    }
+    .score-display {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #F57F17;
+    }
+    .progress-bar-wrap {
+      background: #E0E0E0;
+      border-radius: 8px;
+      height: 10px;
+      width: 100%;
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #43A047, #66BB6A);
+      height: 100%;
+      border-radius: 8px;
+      transition: width 0.45s ease;
+    }
+    .question-text {
+      text-align: center;
+      font-size: 1.55rem;
+      font-weight: 900;
+      color: #1A237E;
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+    .emoji-display {
+      border: 2.5px dashed #B0BEC5;
+      border-radius: 18px;
+      background: #F8FBFF;
+      padding: 18px 12px;
+      text-align: center;
+      min-height: 90px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .emoji-item {
+      font-size: 2.2rem;
+      display: inline-block;
+      animation: popIn 0.25s ease backwards;
+    }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .hint-text {
+      text-align: center;
+      color: #78909C;
+      font-size: 0.88rem;
+      margin-bottom: 18px;
+      font-style: italic;
+    }
+
+    /* Answer buttons grid */
+    .answers-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .answer-btn {
+      background: #29B6F6;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      font-size: 2rem;
+      font-weight: 900;
+      padding: 22px 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(41,182,246,0.35);
+      transition: transform 0.18s, box-shadow 0.18s, background 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .answer-btn:hover:not(:disabled) { transform: scale(1.06); filter: brightness(1.08); }
+    .answer-btn:disabled { cursor: default; }
+    .answer-btn.correct {
+      background: #43A047 !important;
+      box-shadow: 0 4px 16px rgba(67,160,71,0.5);
+      animation: correctPulse 0.5s ease;
+    }
+    .answer-btn.wrong {
+      background: #EF5350 !important;
+      box-shadow: 0 4px 16px rgba(239,83,80,0.45);
+      animation: wrongShake 0.4s ease;
+    }
+    @keyframes correctPulse {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.12); }
+      100% { transform: scale(1); }
+    }
+    @keyframes wrongShake {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-8px); }
+      40%     { transform: translateX(8px); }
+      60%     { transform: translateX(-6px); }
+      80%     { transform: translateX(6px); }
+    }
+
+    /* Feedback */
+    .feedback {
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 800;
+      min-height: 40px;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .feedback.correct-fb { color: #2E7D32; }
+    .feedback.wrong-fb   { color: #E65100; }
+
+    /* Next button */
+    .btn-next {
+      display: none;
+      margin: 0 auto 14px;
+      background: linear-gradient(135deg, #FFD600, #FFA000);
+      color: #5D4037;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      padding: 14px 40px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(255,160,0,0.4);
+      transition: transform 0.18s, box-shadow 0.18s;
+      letter-spacing: 0.5px;
+    }
+    .btn-next:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(255,160,0,0.5); }
+
+    .bottom-hint {
+      text-align: center;
+      color: #90A4AE;
+      font-size: 0.82rem;
+      margin-top: 4px;
+    }
+
+    /* ============================================================
+       STAR PARTICLES
+       ============================================================ */
+    .star-particle {
+      position: fixed;
+      pointer-events: none;
+      font-size: 1.4rem;
+      z-index: 999;
+      animation: starFly 1.2s ease-out forwards;
+    }
+    @keyframes starFly {
+      0%   { opacity: 1; transform: translate(0,0) scale(1) rotate(0deg); }
+      100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.3) rotate(360deg); }
+    }
+
+    /* ============================================================
+       RESULT SCREEN
+       ============================================================ */
+    .result-big-emoji {
+      text-align: center;
+      font-size: 3rem;
+      margin-bottom: 10px;
+      animation: bounce 0.8s ease infinite alternate;
+    }
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-12px); }
+    }
+    .result-title {
+      text-align: center;
+      font-size: 2.1rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #FF6B35, #FF0080, #7B2FBE);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    .result-subtitle {
+      text-align: center;
+      color: #546E7A;
+      font-size: 1rem;
+      margin-bottom: 16px;
+    }
+    .result-score {
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #F57F17;
+      margin-bottom: 12px;
+    }
+    .grade-message {
+      text-align: center;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      padding: 12px 20px;
+      border-radius: 16px;
+    }
+    .grade-excellent { background: #E8F5E9; color: #2E7D32; }
+    .grade-good      { background: #E3F2FD; color: #1565C0; }
+    .grade-ok        { background: #FFF8E1; color: #F57F17; }
+    .grade-try       { background: #FBE9E7; color: #BF360C; }
+
+    .result-buttons {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-restart {
+      background: linear-gradient(135deg, #FFD600, #FFA000);
+      color: #5D4037;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      padding: 14px 36px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(255,160,0,0.4);
+      transition: transform 0.18s;
+    }
+    .btn-restart:hover { transform: scale(1.05); }
+    .btn-home {
+      background: linear-gradient(135deg, #29B6F6, #0288D1);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      padding: 14px 36px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(2,136,209,0.35);
+      transition: transform 0.18s;
+    }
+    .btn-home:hover { transform: scale(1.05); }
+
+    /* ============================================================
+       CONFETTI
+       ============================================================ */
+    .confetti-piece {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9999;
+      animation: confettiFall var(--dur) ease-in var(--delay) forwards;
+    }
+    @keyframes confettiFall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(var(--rot)); opacity: 0; }
+    }
+
+    /* ============================================================
+       FOOTER BAR
+       ============================================================ */
+    .footer-bar {
+      background: rgba(255,255,255,0.72);
+      text-align: center;
+      padding: 10px 16px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #5D4037;
+      flex-shrink: 0;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 500px) {
+      .container { padding: 20px 16px 18px; border-radius: 22px; }
+      .welcome-title { font-size: 1.75rem; }
+      .question-text { font-size: 1.25rem; }
+      .answer-btn { font-size: 1.6rem; padding: 16px 8px; }
+      .btn-start { font-family: 'Baloo 2', 'Nunito', sans-serif; font-size: 1.1rem; padding: 15px 36px; }
+      .logo { font-size: 1rem; }
+      .top-btn { font-size: 0.75rem; padding: 6px 10px; }
+      .emoji-item { font-size: 1.8rem; }
+      .result-title { font-size: 1.6rem; }
+      .result-score { font-size: 1.4rem; }
+    }
+    @media (max-width: 360px) {
+      .answers-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .answer-btn { font-size: 1.4rem; padding: 14px 6px; border-radius: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Clouds (decorative) -->
+  <div class="cloud cloud-1" aria-hidden="true"></div>
+  <div class="cloud cloud-2" aria-hidden="true"></div>
+  <div class="cloud cloud-3" aria-hidden="true"></div>
+  <div class="cloud cloud-4" aria-hidden="true"></div>
+
+  <div class="page-wrapper">
+
+    <!-- ============================
+         TOP BAR (shared)
+         ============================ -->
+    <header class="top-bar">
+      <div class="logo">🌈 BÉ VUI HỌC TOÁN</div>
+      <div class="top-bar-buttons">
+        <button class="top-btn" id="btnMusic" onclick="toggleMusic()" title="Bật/tắt nhạc nền">🎵 Bật nhạc nền</button>
+        <button class="top-btn" id="btnSpeak" onclick="speakCurrentQuestion()" title="Nghe cô đọc câu hỏi">🔊 Nghe cô đọc</button>
+      </div>
+    </header>
+
+    <!-- ============================
+         MAIN CONTENT
+         ============================ -->
+    <main class="main-content">
+
+      <!-- ==============================
+           SCREEN 1: WELCOME
+           ============================== -->
+      <div class="screen active fade-in" id="screenWelcome">
+        <div class="container">
+          <!-- Large decorative emoji row -->
+          <div class="welcome-emoji-row" aria-hidden="true">🍎 🍌 🍊 🍓 🍇</div>
+
+          <!-- Game title -->
+          <h1 class="welcome-title">TRÒ CHƠI TOÁN HỌC</h1>
+
+          <!-- Subtitle -->
+          <p class="welcome-subtitle">
+            Bé hãy quan sát thật kỹ, đếm thật chính xác và chọn đáp án đúng nhé!
+          </p>
+
+          <!-- Feature pills -->
+          <div class="feature-pills">
+            <span class="pill">🔢 Đếm số lượng</span>
+            <span class="pill">🧠 Chọn đáp án đúng</span>
+            <span class="pill">⭐ Nhận lời khen</span>
+          </div>
+
+          <!-- Start button -->
+          <button class="btn-start" onclick="startGame()" aria-label="Bắt đầu chơi">
+            BẮT ĐẦU CHƠI ▶
+          </button>
+
+          <!-- Age label -->
+          <p class="welcome-age">Dành cho các bé mẫu giáo 5–6 tuổi</p>
+
+          <!-- Flower decoration -->
+          <div class="flowers" aria-hidden="true">🌸 🌿 🌷 🌿 🌸</div>
+        </div>
+      </div>
+      <!-- END SCREEN 1 -->
+
+      <!-- ==============================
+           SCREEN 2: QUESTION
+           ============================== -->
+      <div class="screen" id="screenQuestion">
+        <div class="container">
+          <!-- Header: question number + score -->
+          <div class="question-header">
+            <span class="question-number" id="questionNumber">Câu 1/10</span>
+            <span class="score-display" id="scoreDisplay">⭐ Điểm: 0</span>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="progress-bar-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBarWrap">
+            <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+          </div>
+
+          <!-- Question text -->
+          <p class="question-text" id="questionText">Có bao nhiêu quả táo?</p>
+
+          <!-- Emoji display area -->
+          <div class="emoji-display" id="emojiDisplay" aria-label="Vùng hiển thị biểu tượng"></div>
+
+          <!-- Hint -->
+          <p class="hint-text">Hãy đếm thật kỹ các hình nhé!</p>
+
+          <!-- Answer buttons -->
+          <div class="answers-grid" id="answersGrid" role="group" aria-label="Các đáp án"></div>
+
+          <!-- Feedback message -->
+          <div class="feedback" id="feedbackMsg" aria-live="polite"></div>
+
+          <!-- Next question button (hidden until correct) -->
+          <button class="btn-next" id="btnNext" onclick="nextQuestion()">
+            CÂU TIẾP THEO ➜
+          </button>
+
+          <!-- Bottom hint -->
+          <p class="bottom-hint">Bé hãy chạm vào đáp án mình chọn nhé!</p>
+
+          <!-- Flower decoration -->
+          <div class="flowers" aria-hidden="true">🌸 🌿 🌷 🌿 🌸</div>
+        </div>
+      </div>
+      <!-- END SCREEN 2 -->
+
+      <!-- ==============================
+           SCREEN 3: RESULT
+           ============================== -->
+      <div class="screen" id="screenResult">
+        <div class="container">
+          <!-- Celebration emojis -->
+          <div class="result-big-emoji" aria-hidden="true">🎉🎊🎉</div>
+
+          <!-- Title -->
+          <h2 class="result-title">CHÚC MỪNG BÉ!</h2>
+
+          <!-- Subtitle -->
+          <p class="result-subtitle">Bé đã hoàn thành 10 câu hỏi toán học!</p>
+
+          <!-- Score -->
+          <div class="result-score" id="resultScore">⭐ Điểm của bé: 0/10</div>
+
+          <!-- Grade message -->
+          <div class="grade-message" id="gradeMessage"></div>
+
+          <!-- Action buttons -->
+          <div class="result-buttons">
+            <button class="btn-restart" onclick="restartGame()">CHƠI LẠI 🔄</button>
+            <button class="btn-home" onclick="goHome()">VỀ TRANG CHỦ 🏠</button>
+          </div>
+
+          <!-- Flower decoration -->
+          <div class="flowers" style="margin-top:20px;" aria-hidden="true">🌸 🌿 🌷 🌿 🌸</div>
+        </div>
+      </div>
+      <!-- END SCREEN 3 -->
+
+    </main>
+
+    <!-- ============================
+         FOOTER BAR
+         ============================ -->
+    <footer class="footer-bar">
+      🌺 Các con hãy quan sát thật kỹ, đếm thật chính xác và chọn đáp án đúng nhé! 🌺
+    </footer>
+
+  </div><!-- end .page-wrapper -->
+
+  <!-- ============================================================
+       JAVASCRIPT
+       ============================================================ -->
+  <script>
+    /* =========================================================
+       QUESTION CATEGORY DATA
+       ========================================================= */
+    const QUESTION_CATEGORIES = [
+      {
+        id: 'fruits',
+        items: [
+          { emoji: '🍎', name: 'quả táo' },
+          { emoji: '🍌', name: 'quả chuối' },
+          { emoji: '🍊', name: 'quả cam' },
+          { emoji: '🍓', name: 'quả dâu' },
+          { emoji: '🍇', name: 'chùm nho' },
+          { emoji: '🍉', name: 'quả dưa hấu' },
+        ]
+      },
+      {
+        id: 'people',
+        items: [
+          { emoji: '👦', name: 'bạn trai nhỏ' },
+          { emoji: '👧', name: 'bạn gái nhỏ' },
+          { emoji: '🧒', name: 'bạn nhỏ' },
+        ]
+      },
+      {
+        id: 'trees',
+        items: [
+          { emoji: '🌳', name: 'cây xanh' },
+          { emoji: '🌲', name: 'cây thông' },
+          { emoji: '🌴', name: 'cây dừa' },
+          { emoji: '🌻', name: 'hoa hướng dương' },
+          { emoji: '🌷', name: 'hoa tulip' },
+        ]
+      },
+      {
+        id: 'squares',
+        items: [{ emoji: '🟦', name: 'hình vuông' }]
+      },
+      {
+        id: 'triangles',
+        items: [{ emoji: '🔺', name: 'hình tam giác' }]
+      },
+      {
+        id: 'circles',
+        items: [{ emoji: '🔵', name: 'hình tròn' }]
+      }
+    ];
+
+    /* =========================================================
+       GAME STATE
+       ========================================================= */
+    let currentQuestionIndex = 0; // current question (0-indexed)
+    let questions = [];            // array of 10 question objects
+    let score = 0;                 // player's score
+    let answered = false;          // has the current question been answered correctly?
+    let currentQuestionData = null;// convenience reference
+
+    /* =========================================================
+       BACKGROUND MUSIC STATE
+       ========================================================= */
+    let audioCtx = null;
+    let musicGain = null;
+    let musicNodes = [];           // oscillators / sources currently playing
+    let musicPlaying = false;
+    let musicScheduled = false;
+    let musicScheduleId = null;
+    let musicStartTime = 0;
+    let musicNoteIndex = 0;
+
+    /* =========================================================
+       UTILITY: Fisher-Yates Shuffle
+       ========================================================= */
+    function shuffleArray(array) {
+      const arr = array.slice(); // shallow copy – do not mutate original
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    /* =========================================================
+       GENERATE QUESTIONS
+       Produces exactly 10 questions ensuring each of the 6
+       categories appears at least once.
+       ========================================================= */
+    function generateQuestions() {
+      const totalQuestions = 10;
+      const numCategories = QUESTION_CATEGORIES.length; // 6
+      const result = [];
+      const usedKeys = new Set(); // track "emoji+count" pairs to avoid duplicates
+
+      // Helper: pick a random item from an array
+      function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+      // Helper: build one question object from a category
+      function buildQuestion(cat) {
+        const item = pick(cat.items);
+        let count;
+        let key;
+        let attempts = 0;
+        // Try to find an unused emoji+count combination
+        do {
+          count = Math.floor(Math.random() * 10) + 1; // 1-10
+          key = item.emoji + '_' + count;
+          attempts++;
+        } while (usedKeys.has(key) && attempts < 30);
+        usedKeys.add(key);
+
+        // Build question text
+        const questionText = `Có bao nhiêu ${item.name}?`;
+
+        return {
+          questionText,
+          emoji: item.emoji,
+          count,
+          answers: generateAnswers(count),
+          correctAnswer: count
+        };
+      }
+
+      // Step 1: One question per category (6 questions guaranteed)
+      const shuffledCats = shuffleArray(QUESTION_CATEGORIES);
+      for (let i = 0; i < numCategories; i++) {
+        result.push(buildQuestion(shuffledCats[i]));
+      }
+
+      // Step 2: Fill remaining 4 questions from random categories
+      for (let i = numCategories; i < totalQuestions; i++) {
+        const cat = pick(QUESTION_CATEGORIES);
+        result.push(buildQuestion(cat));
+      }
+
+      // Step 3: Shuffle entire question order
+      return shuffleArray(result);
+    }
+
+    /* =========================================================
+       GENERATE ANSWERS
+       Returns an array of 4 unique answers (shuffled).
+       ========================================================= */
+    function generateAnswers(correctAnswer) {
+      const answers = new Set();
+      answers.add(correctAnswer);
+
+      // Distractors: stay in 1-10 range, close to correct answer
+      const maxAttempts = 60;
+      let attempts = 0;
+
+      while (answers.size < 4 && attempts < maxAttempts) {
+        attempts++;
+        // Offset by ±1 to ±4
+        const offset = Math.floor(Math.random() * 4) + 1;
+        const sign   = Math.random() < 0.5 ? 1 : -1;
+        let candidate = correctAnswer + sign * offset;
+
+        // Clamp to 1-10
+        candidate = Math.max(1, Math.min(10, candidate));
+        answers.add(candidate);
+      }
+
+      // If we still need more (edge case near 1 or 10), add safe values
+      const fallbacks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      for (const fb of fallbacks) {
+        if (answers.size >= 4) break;
+        answers.add(fb);
+      }
+
+      return shuffleArray(Array.from(answers).slice(0, 4));
+    }
+
+    /* =========================================================
+       RENDER QUESTION
+       ========================================================= */
+    function renderQuestion(questionIndex) {
+      currentQuestionData = questions[questionIndex];
+      answered = false;
+
+      // Update header
+      document.getElementById('questionNumber').textContent =
+        `Câu ${questionIndex + 1}/10`;
+      document.getElementById('scoreDisplay').textContent =
+        `⭐ Điểm: ${score}`;
+
+      // Progress bar
+      const pct = (questionIndex / 10) * 100;
+      const bar = document.getElementById('progressBar');
+      bar.style.width = pct + '%';
+      document.getElementById('progressBarWrap').setAttribute('aria-valuenow', Math.round(pct));
+
+      // Question text
+      document.getElementById('questionText').textContent =
+        currentQuestionData.questionText;
+
+      // Emoji display area
+      const emojiDisplay = document.getElementById('emojiDisplay');
+      emojiDisplay.innerHTML = '';
+      for (let i = 0; i < currentQuestionData.count; i++) {
+        const span = document.createElement('span');
+        span.className = 'emoji-item';
+        span.textContent = currentQuestionData.emoji;
+        span.style.animationDelay = (i * 0.06) + 's';
+        emojiDisplay.appendChild(span);
+      }
+
+      // Answer buttons
+      const grid = document.getElementById('answersGrid');
+      grid.innerHTML = '';
+      currentQuestionData.answers.forEach((ans) => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = ans;
+        btn.setAttribute('aria-label', `Đáp án ${ans}`);
+        btn.onclick = () => checkAnswer(ans, currentQuestionData.correctAnswer, btn, grid);
+        grid.appendChild(btn);
+      });
+
+      // Clear feedback and hide next button
+      document.getElementById('feedbackMsg').textContent = '';
+      document.getElementById('feedbackMsg').className = 'feedback';
+      document.getElementById('btnNext').style.display = 'none';
+
+      // Auto-read the question aloud
+      setTimeout(() => {
+        speakVietnamese(currentQuestionData.questionText);
+      }, 400);
+    }
+
+    /* =========================================================
+       CHECK ANSWER
+       ========================================================= */
+    function checkAnswer(selectedAnswer, correctAnswer, clickedBtn, grid) {
+      if (answered) return; // already answered correctly, ignore
+
+      const allBtns = grid.querySelectorAll('.answer-btn');
+      // Disable all buttons immediately
+      allBtns.forEach(b => b.disabled = true);
+
+      const feedbackEl = document.getElementById('feedbackMsg');
+
+      if (selectedAnswer === correctAnswer) {
+        // === CORRECT ===
+        answered = true;
+        score++;
+
+        clickedBtn.classList.add('correct');
+
+        feedbackEl.textContent = '🎉 Chính xác, bé giỏi quá!!';
+        feedbackEl.className = 'feedback correct-fb';
+
+        document.getElementById('scoreDisplay').textContent = `⭐ Điểm: ${score}`;
+
+        // Show next button
+        const btnNext = document.getElementById('btnNext');
+        btnNext.style.display = 'block';
+
+        // Star particles
+        spawnStars(clickedBtn);
+
+        // TTS feedback
+        speakVietnamese('Chính xác rồi! Bé giỏi quá!');
+
+        // Play correct sound
+        playCorrectSound();
+
+      } else {
+        // === WRONG ===
+        clickedBtn.classList.add('wrong');
+
+        feedbackEl.textContent =
+          `💛 Chưa chính xác! Đáp án phải là ${correctAnswer}. Mình cố gắng ở câu tiếp theo nha!`;
+        feedbackEl.className = 'feedback wrong-fb';
+
+        // Re-enable all buttons after a short delay (allow retry until correct)
+        setTimeout(() => {
+          allBtns.forEach(b => {
+            b.disabled = false;
+            // Remove the wrong class from the clicked button after shake
+            if (b !== clickedBtn) return;
+          });
+          // Keep wrong button highlighted but allow other presses
+          allBtns.forEach(b => { if (!b.classList.contains('wrong')) b.disabled = false; });
+        }, 800);
+
+        // TTS feedback
+        speakVietnamese(`Chưa đúng rồi! Đáp án đúng là ${correctAnswer}. Bé hãy cố gắng nhé!`);
+
+        // Play wrong sound
+        playWrongSound();
+      }
+    }
+
+    /* =========================================================
+       SPEAK CURRENT QUESTION (called from top bar button)
+       ========================================================= */
+    function speakCurrentQuestion() {
+      if (currentQuestionData) {
+        speakVietnamese(currentQuestionData.questionText);
+      } else {
+        speakVietnamese('Xin chào bé! Hãy bắt đầu trò chơi toán học nhé!');
+      }
+    }
+
+    /* =========================================================
+       SPEAK VIETNAMESE — Google Translate TTS (giong tu nhien)
+       Fallback: Web Speech API neu bi block
+       ========================================================= */
+
+    // Phan tu audio dung chung
+    const _ttsAudio = new Audio();
+    _ttsAudio.volume = 1.0;
+
+    function speakVietnamese(text) {
+      if (!text) return;
+
+      // Dung bat ky giong doc nao dang phat
+      _ttsAudio.pause();
+      _ttsAudio.currentTime = 0;
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+      // Gioi han 200 ky tu (Google TTS gioi han do dai)
+      const safeText = text.length > 200 ? text.substring(0, 200) : text;
+
+      // Google Translate TTS — khong can API key, giong Viet tu nhien
+      const url = 'https://translate.google.com/translate_tts?ie=UTF-8'
+                + '&tl=vi'
+                + '&client=tw-ob'
+                + '&q=' + encodeURIComponent(safeText);
+
+      _ttsAudio.src = url;
+
+      // Phat — neu bi block (CORS/offline) thi fallback Web Speech API
+      _ttsAudio.play().catch(function() { _speakFallback(text); });
+    }
+
+    // Fallback: Web Speech API (giong may tong hop)
+    function _speakFallback(text) {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'vi-VN';
+      utterance.rate = 0.85;
+      utterance.pitch = 1.1;
+      utterance.volume = 1.0;
+      const voices = window.speechSynthesis.getVoices();
+      const viVoice = voices.find(function(v) {
+        return v.lang && v.lang.toLowerCase().includes('vi') && !v.name.toLowerCase().includes('male');
+      }) || voices.find(function(v) { return v.lang && v.lang.toLowerCase().includes('vi'); });
+      if (viVoice) utterance.voice = viVoice;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Voices may load asynchronously - handle that
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = function() {
+        // Voices are now loaded; nothing extra needed
+      };
+    }
+
+    
+/* =========================================================
+       NEXT QUESTION
+       ========================================================= */
+    function nextQuestion() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex >= 10) {
+        showResult();
+      } else {
+        renderQuestion(currentQuestionIndex);
+      }
+    }
+
+    /* =========================================================
+       SHOW RESULT SCREEN
+       ========================================================= */
+    function showResult() {
+      // Update score display
+      document.getElementById('resultScore').textContent =
+        `⭐ Điểm của bé: ${score}/10`;
+
+      // Grade message
+      const gradeEl = document.getElementById('gradeMessage');
+      if (score === 10) {
+        gradeEl.textContent = '🌟 Xuất sắc! Bé thật thông minh và giỏi giang! Cô rất tự hào về bé!';
+        gradeEl.className = 'grade-message grade-excellent';
+      } else if (score >= 8) {
+        gradeEl.textContent = '😊 Rất giỏi! Bé đã làm rất tốt! Tiếp tục phát huy nhé!';
+        gradeEl.className = 'grade-message grade-good';
+      } else if (score >= 6) {
+        gradeEl.textContent = '👍 Khá giỏi! Bé làm được rồi! Cố gắng thêm một chút nữa nhé!';
+        gradeEl.className = 'grade-message grade-ok';
+      } else {
+        gradeEl.textContent = '💪 Cố gắng lên bé ơi! Hãy thử lại, bé chắc chắn sẽ làm tốt hơn!';
+        gradeEl.className = 'grade-message grade-try';
+      }
+
+      // Show result screen
+      switchScreen('screenResult');
+
+      // Celebration TTS
+      setTimeout(() => {
+        speakVietnamese(
+          `Bé đã hoàn thành trò chơi! Điểm của bé là ${score} trên mười. ${
+            score === 10 ? 'Xuất sắc!' :
+            score >= 8  ? 'Rất giỏi!' :
+            score >= 6  ? 'Khá giỏi!' :
+            'Cố gắng lên bé nhé!'
+          }`
+        );
+      }, 600);
+
+      // Confetti / fireworks
+      launchConfetti();
+    }
+
+    /* =========================================================
+       START GAME
+       ========================================================= */
+    function startGame() {
+      score = 0;
+      currentQuestionIndex = 0;
+      questions = generateQuestions();
+      switchScreen('screenQuestion');
+      renderQuestion(0);
+    }
+
+    /* =========================================================
+       RESTART GAME
+       ========================================================= */
+    function restartGame() {
+      score = 0;
+      currentQuestionIndex = 0;
+      questions = generateQuestions();
+      switchScreen('screenQuestion');
+      renderQuestion(0);
+    }
+
+    /* =========================================================
+       GO HOME
+       ========================================================= */
+    function goHome() {
+      currentQuestionData = null;
+      switchScreen('screenWelcome');
+    }
+
+    /* =========================================================
+       SWITCH SCREEN (fade transition)
+       ========================================================= */
+    function switchScreen(targetId) {
+      const screens = document.querySelectorAll('.screen');
+      screens.forEach(s => {
+        s.classList.remove('active', 'fade-in');
+        s.style.display = 'none';
+        s.style.opacity = '0';
+      });
+      const target = document.getElementById(targetId);
+      target.style.display = 'block';
+      // Force reflow then fade in
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          target.classList.add('active', 'fade-in');
+          target.style.opacity = '1';
+        });
+      });
+    }
+
+    /* =========================================================
+       SPAWN STAR PARTICLES (correct answer celebration)
+       ========================================================= */
+    function spawnStars(referenceEl) {
+      const rect = referenceEl.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const emojis = ['⭐', '✨', '🌟', '💫'];
+
+      for (let i = 0; i < 12; i++) {
+        const star = document.createElement('div');
+        star.className = 'star-particle';
+        star.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+        const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.5;
+        const dist  = 60 + Math.random() * 80;
+        const dx = Math.cos(angle) * dist;
+        const dy = Math.sin(angle) * dist - 40;
+
+        star.style.left = cx + 'px';
+        star.style.top  = cy + 'px';
+        star.style.setProperty('--dx', dx + 'px');
+        star.style.setProperty('--dy', dy + 'px');
+
+        document.body.appendChild(star);
+        setTimeout(() => star.remove(), 1300);
+      }
+    }
+
+    /* =========================================================
+       CONFETTI EFFECT
+       ========================================================= */
+    function launchConfetti() {
+      const colors = [
+        '#FF6B35','#FFD600','#43A047','#29B6F6',
+        '#AB47BC','#FF4081','#00BCD4','#8BC34A','#FF5722','#3F51B5'
+      ];
+      const shapes = ['circle','square'];
+
+      for (let i = 0; i < 80; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const size  = 8 + Math.random() * 8;
+        const left  = Math.random() * 100;
+        const dur   = (1.8 + Math.random() * 2).toFixed(2);
+        const delay = (Math.random() * 1.5).toFixed(2);
+        const rot   = (Math.random() * 720 - 360).toFixed(0) + 'deg';
+        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+
+        piece.style.cssText = `
+          left: ${left}vw;
+          top: -20px;
+          width: ${size}px;
+          height: ${size}px;
+          background: ${color};
+          border-radius: ${shape === 'circle' ? '50%' : '2px'};
+          --dur: ${dur}s;
+          --delay: ${delay}s;
+          --rot: ${rot};
+        `;
+
+        document.body.appendChild(piece);
+        // Clean up after animation
+        const removePiece = piece;
+        setTimeout(() => removePiece.remove(), (parseFloat(dur) + parseFloat(delay)) * 1000 + 200);
+      }
+    }
+
+    /* =========================================================
+       BACKGROUND MUSIC (Web Audio API)
+       Generates a simple looping pentatonic melody.
+       ========================================================= */
+
+    // Pentatonic scale notes (Hz) - C major pentatonic
+    const MELODY_NOTES = [
+      261.63, // C4
+      329.63, // E4
+      392.00, // G4
+      440.00, // A4
+      523.25, // C5
+      392.00, // G4
+      440.00, // A4
+      329.63, // E4
+      261.63, // C4
+      392.00, // G4
+      523.25, // C5
+      440.00, // A4
+      329.63, // E4
+      392.00, // G4
+      261.63, // C4
+      392.00, // G4
+    ];
+    const NOTE_DURATION = 0.38; // seconds per note
+
+    function createAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        musicGain = audioCtx.createGain();
+        musicGain.gain.value = 0.14; // quiet background music
+        musicGain.connect(audioCtx.destination);
+      }
+    }
+
+    function scheduleMusicLoop() {
+      if (!musicPlaying) return;
+
+      const now = audioCtx.currentTime;
+      const lookahead = 0.3; // seconds ahead to schedule
+
+      // Schedule notes until we've filled the lookahead window
+      while (musicStartTime < now + lookahead) {
+        const noteFreq = MELODY_NOTES[musicNoteIndex % MELODY_NOTES.length];
+        scheduleNote(noteFreq, musicStartTime, NOTE_DURATION * 0.85);
+        musicStartTime += NOTE_DURATION;
+        musicNoteIndex++;
+      }
+
+      musicScheduleId = setTimeout(scheduleMusicLoop, 150); // check again soon
+    }
+
+    function scheduleNote(freq, startTime, duration) {
+      const osc  = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.value = freq;
+
+      // Envelope: quick attack, sustain, fade out
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(0.9, startTime + 0.04);
+      gain.gain.setValueAtTime(0.9, startTime + duration * 0.6);
+      gain.gain.linearRampToValueAtTime(0, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(musicGain);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration + 0.05);
+    }
+
+    function toggleMusic() {
+      const btn = document.getElementById('btnMusic');
+
+      if (musicPlaying) {
+        // Stop music
+        musicPlaying = false;
+        clearTimeout(musicScheduleId);
+        if (audioCtx) audioCtx.suspend();
+        btn.textContent = '🎵 Bật nhạc nền';
+        btn.classList.remove('music-on');
+      } else {
+        // Start music
+        createAudioContext();
+        audioCtx.resume().then(() => {
+          musicPlaying = true;
+          musicStartTime = audioCtx.currentTime + 0.1;
+          musicNoteIndex = 0;
+          scheduleMusicLoop();
+          btn.textContent = '🎵 Tắt nhạc nền';
+          btn.classList.add('music-on');
+        });
+      }
+    }
+
+    /* =========================================================
+       SOUND EFFECTS (Web Audio API)
+       ========================================================= */
+    function playSoundEffect(type) {
+      createAudioContext();
+      if (!audioCtx) return;
+      audioCtx.resume();
+
+      const sfxGain = audioCtx.createGain();
+      sfxGain.connect(audioCtx.destination);
+
+      if (type === 'correct') {
+        // Happy ascending arpeggio
+        const freqs = [392, 523.25, 659.25, 784];
+        freqs.forEach((f, i) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'sine';
+          o.frequency.value = f;
+          g.gain.setValueAtTime(0, audioCtx.currentTime + i * 0.12);
+          g.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + i * 0.12 + 0.05);
+          g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + i * 0.12 + 0.22);
+          o.connect(g);
+          g.connect(sfxGain);
+          o.start(audioCtx.currentTime + i * 0.12);
+          o.stop(audioCtx.currentTime + i * 0.12 + 0.25);
+        });
+        sfxGain.gain.value = 0.6;
+      } else if (type === 'wrong') {
+        // Descending tone
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(300, audioCtx.currentTime);
+        o.frequency.linearRampToValueAtTime(150, audioCtx.currentTime + 0.4);
+        g.gain.setValueAtTime(0.35, audioCtx.currentTime);
+        g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.4);
+        o.connect(g);
+        g.connect(sfxGain);
+        sfxGain.gain.value = 0.5;
+        o.start(audioCtx.currentTime);
+        o.stop(audioCtx.currentTime + 0.42);
+      }
+    }
+
+    function playCorrectSound() { playSoundEffect('correct'); }
+    function playWrongSound()   { playSoundEffect('wrong');   }
+
+    /* =========================================================
+       INITIALIZATION
+       On page load, show welcome screen and init voices
+       ========================================================= */
+    window.addEventListener('load', () => {
+      // Pre-load voices (may be async in some browsers)
+      if (window.speechSynthesis) {
+        window.speechSynthesis.getVoices();
+      }
+      // Make sure welcome screen is shown
+      switchScreen('screenWelcome');
+    });
+
+  </script>
+</body>
+</html>
