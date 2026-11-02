@@ -748,7 +748,8 @@
     let questions = [];            // array of 10 question objects
     let score = 0;                 // player's score
     let answered = false;          // has the current question been answered correctly?
-    let currentQuestionData = null;// convenience reference
+    let currentQuestionData = null;
+    let currentScreen = 'screenWelcome';// convenience reference
 
     /* =========================================================
        BACKGROUND MUSIC STATE
@@ -988,11 +989,27 @@
     /* =========================================================
        SPEAK CURRENT QUESTION (called from top bar button)
        ========================================================= */
+        function getResultMessage() {
+      let danhGia = '';
+      if (score === 10) {
+        danhGia = 'Bé là thiên tài toán học!';
+      } else if (score >= 8) {
+        danhGia = 'Bé học toán rất giỏi!';
+      } else if (score >= 5) {
+        danhGia = 'Bé đã cố gắng rất tốt!';
+      } else {
+        danhGia = 'Bé hãy luyện tập thêm nhé!';
+      }
+      return 'Chúc mừng bé! Bé đã hoàn thành mười câu hỏi toán học! Điểm của bé là ' + score + ' trên mười. ' + danhGia;
+    }
+
     function speakCurrentQuestion() {
-      if (currentQuestionData) {
+      if (currentScreen === 'screenResult') {
+        speakVietnamese(getResultMessage());
+      } else if (currentScreen === 'screenQuestion' && currentQuestionData) {
         speakVietnamese(currentQuestionData.questionText);
       } else {
-        speakVietnamese('Xin chào bé! Hãy bắt đầu trò chơi toán học nhé!');
+        speakVietnamese('Xin chào các bé! Các con hãy quan sát thật kỹ, đếm thật chính xác và chọn đáp án đúng nhé!');
       }
     }
 
@@ -1161,22 +1178,20 @@
        ========================================================= */
     function showResult() {
       // Update score display
-      document.getElementById('resultScore').textContent =
-        `⭐ Điểm của bé: ${score}/10`;
+      document.getElementById('resultScore').textContent = '⭐ Điểm của bé: ' + score + '/10';
 
-      // Grade message
       const gradeEl = document.getElementById('gradeMessage');
       if (score === 10) {
-        gradeEl.textContent = '🌟 Xuất sắc! Bé thật thông minh và giỏi giang! Cô rất tự hào về bé!';
+        gradeEl.textContent = '🌟 Xuất sắc! Bé là thiên tài toán học! Cô rất tự hào về bé!';
         gradeEl.className = 'grade-message grade-excellent';
       } else if (score >= 8) {
-        gradeEl.textContent = '😊 Rất giỏi! Bé đã làm rất tốt! Tiếp tục phát huy nhé!';
+        gradeEl.textContent = '👏 Rất giỏi! Bé học toán rất giỏi! Tiếp tục phát huy nhé!';
         gradeEl.className = 'grade-message grade-good';
-      } else if (score >= 6) {
-        gradeEl.textContent = '👍 Khá giỏi! Bé làm được rồi! Cố gắng thêm một chút nữa nhé!';
+      } else if (score >= 5) {
+        gradeEl.textContent = '👍 Bé đã cố gắng rất tốt! Cố gắng thêm một chút nữa nhé!';
         gradeEl.className = 'grade-message grade-ok';
       } else {
-        gradeEl.textContent = '💪 Cố gắng lên bé ơi! Hãy thử lại, bé chắc chắn sẽ làm tốt hơn!';
+        gradeEl.textContent = '💪 Cố gắng lên bé ơi! Bé hãy luyện tập thêm nhé!';
         gradeEl.className = 'grade-message grade-try';
       }
 
@@ -1184,16 +1199,9 @@
       switchScreen('screenResult');
 
       // Celebration TTS
-      setTimeout(() => {
-        speakVietnamese(
-          `Bé đã hoàn thành trò chơi! Điểm của bé là ${score} trên mười. ${
-            score === 10 ? 'Xuất sắc!' :
-            score >= 8  ? 'Rất giỏi!' :
-            score >= 6  ? 'Khá giỏi!' :
-            'Cố gắng lên bé nhé!'
-          }`
-        );
-      }, 600);
+      setTimeout(function() {
+        speakVietnamese(getResultMessage());
+      }, 200);
 
       // Confetti / fireworks
       launchConfetti();
@@ -1233,6 +1241,7 @@
        SWITCH SCREEN (fade transition)
        ========================================================= */
     function switchScreen(targetId) {
+      currentScreen = targetId;
       const screens = document.querySelectorAll('.screen');
       screens.forEach(s => {
         s.classList.remove('active', 'fade-in');
