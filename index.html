@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
   <title>Trò Chơi Toán Học - Bé Vui Học Toán</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -990,63 +991,103 @@
     }
 
     /* =========================================================
-       SPEAK VIETNAMESE — Google Translate TTS (giong tu nhien)
-       Fallback: Web Speech API neu bi block
+       SPEAK VIETNAMESE (Google TTS chuẩn + Web Speech dự phòng)
        ========================================================= */
 
-    // Phan tu audio dung chung
-    const _ttsAudio = new Audio();
-    _ttsAudio.volume = 1.0;
+    let _cachedVoices = [];
+    function loadVoices() {
+      if (window.speechSynthesis) {
+        _cachedVoices = window.speechSynthesis.getVoices();
+      }
+    }
+    loadVoices();
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function findVietnameseVoice() {
+      if (!_cachedVoices || _cachedVoices.length === 0) loadVoices();
+      // 1. Giọng nữ tự nhiên (Edge/Windows: HoaiMy, Mai)
+      let v = _cachedVoices.find(voice => 
+        (voice.lang === 'vi-VN' || voice.lang === 'vi') && 
+        (voice.name.includes('HoaiMy') || voice.name.includes('Natural') || voice.name.includes('Online'))
+      );
+      if (v) return v;
+
+      // 2. Bất kỳ giọng nữ tiếng Việt nào
+      v = _cachedVoices.find(voice => 
+        (voice.lang === 'vi-VN' || voice.lang === 'vi') && 
+        !voice.name.toLowerCase().includes('male')
+      );
+      if (v) return v;
+
+      // 3. Bất kỳ giọng tiếng Việt nào (kể cả giọng Google tiếng Việt trong Chrome)
+      v = _cachedVoices.find(voice => 
+        voice.lang === 'vi-VN' || voice.lang === 'vi' ||
+        voice.lang.toLowerCase().startsWith('vi') ||
+        voice.name.toLowerCase().includes('vietnam') ||
+        voice.name.toLowerCase().includes('tiếng việt')
+      );
+      return v || null;
+    }
+
+    let _currentAudio = null;
 
     function speakVietnamese(text) {
       if (!text) return;
 
-      // Dung bat ky giong doc nao dang phat
-      _ttsAudio.pause();
-      _ttsAudio.currentTime = 0;
-      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      // Dừng âm thanh và giọng đọc cũ
+      if (_currentAudio) {
+        _currentAudio.pause();
+        _currentAudio.currentTime = 0;
+        _currentAudio = null;
+      }
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
 
-      // Gioi han 200 ky tu (Google TTS gioi han do dai)
-      const safeText = text.length > 200 ? text.substring(0, 200) : text;
+      // Giới hạn độ dài an toàn cho TTS
+      const cleanText = text.replace(/[*#_~]/g, '').trim();
+      const safeText = cleanText.length > 150 ? cleanText.substring(0, 150) : cleanText;
 
-      // Google Translate TTS — khong can API key, giong Viet tu nhien
-      const url = 'https://translate.google.com/translate_tts?ie=UTF-8'
-                + '&tl=vi'
-                + '&client=tw-ob'
-                + '&q=' + encodeURIComponent(safeText);
+      // Ưu tiên 1: Google Translate TTS trực tiếp (giọng nữ chuẩn tự nhiên 100%)
+      const googleUrl = 'https://translate.google.com/translate_tts?ie=UTF-8&tl=vi&client=tw-ob&q=' + encodeURIComponent(safeText);
+      const audio = new Audio();
+      audio.crossOrigin = 'anonymous';
+      audio.src = googleUrl;
+      _currentAudio = audio;
 
-      _ttsAudio.src = url;
-
-      // Phat — neu bi block (CORS/offline) thi fallback Web Speech API
-      _ttsAudio.play().catch(function() { _speakFallback(text); });
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(function(err) {
+          // Nếu Google TTS bị chặn trên trình duyệt/thiết bị này -> Dùng Web Speech API
+          _speakWithWebSpeech(cleanText);
+        });
+      }
     }
 
-    // Fallback: Web Speech API (giong may tong hop)
-    function _speakFallback(text) {
+    function _speakWithWebSpeech(text) {
       if (!window.speechSynthesis) return;
       window.speechSynthesis.cancel();
+
+      const viVoice = findVietnameseVoice();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'vi-VN';
-      utterance.rate = 0.85;
-      utterance.pitch = 1.1;
+      utterance.rate = 0.88;
+      utterance.pitch = 1.05;
       utterance.volume = 1.0;
-      const voices = window.speechSynthesis.getVoices();
-      const viVoice = voices.find(function(v) {
-        return v.lang && v.lang.toLowerCase().includes('vi') && !v.name.toLowerCase().includes('male');
-      }) || voices.find(function(v) { return v.lang && v.lang.toLowerCase().includes('vi'); });
-      if (viVoice) utterance.voice = viVoice;
-      window.speechSynthesis.speak(utterance);
+
+      if (viVoice) {
+        utterance.voice = viVoice;
+        window.speechSynthesis.speak(utterance);
+      } else {
+        // TUYỆT ĐỐI KHÔNG dùng giọng tiếng Anh mặc định để đọc tiếng Việt
+        // Thay vào đó chỉ phát âm khi trình duyệt có hỗ trợ tiếng Việt
+        console.warn('Không tìm thấy giọng tiếng Việt cục bộ trên thiết bị.');
+      }
     }
 
-    // Voices may load asynchronously - handle that
-    if (window.speechSynthesis) {
-      window.speechSynthesis.onvoiceschanged = function() {
-        // Voices are now loaded; nothing extra needed
-      };
-    }
-
-    
-/* =========================================================
+    /* =========================================================
        NEXT QUESTION
        ========================================================= */
     function nextQuestion() {
