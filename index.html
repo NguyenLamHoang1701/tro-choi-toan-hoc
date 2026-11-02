@@ -1081,7 +1081,7 @@
       audio.currentTime = 0;
 
       // Google TTS URL (KHONG DUNG crossOrigin de khong bi chan boi CORS)
-      const googleUrl = 'https://translate.google.com/translate_tts?ie=UTF-8&tl=vi&client=tw-ob&q=' + encodeURIComponent(safeText);
+      const googleUrl = 'https://translate.google.com/translate_tts?ie=UTF-8&tl=vi&client=tw-ob&total=1&idx=0&textlen=' + safeText.length + '&q=' + encodeURIComponent(safeText);
 
       let fallbackUsed = false;
       function fallbackToWebSpeech() {
@@ -1124,9 +1124,15 @@
       utterance.volume = 1.0;
 
       const viVoice = findVietnameseVoice();
-      if (viVoice) {
-        utterance.voice = viVoice;
+      if (!viVoice) {
+        // Neu thiet bi chua co giong tieng Viet, TUYET DOI khong de giong tieng Anh doc nhai
+        setBtnSpeakState(false);
+        console.warn('Thiet bi chua ho tro giong tieng Viet offline.');
+        return;
       }
+
+      utterance.voice = viVoice;
+      utterance.lang = viVoice.lang || 'vi-VN';
 
       utterance.onend = function() {
         setBtnSpeakState(false);
