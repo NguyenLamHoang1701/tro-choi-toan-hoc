@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -534,6 +534,7 @@
   </style>
 </head>
 <body>
+  <audio id="ttsAudio" preload="auto" playsinline style="display:none"></audio>
 
   <!-- Floating Clouds (decorative) -->
   <div class="cloud cloud-1" aria-hidden="true"></div>
@@ -991,13 +992,13 @@
     }
 
     /* =========================================================
-       SPEAK VIETNAMESE (Google TTS chuẩn + Web Speech dự phòng)
+       SPEAK VIETNAMESE (Google TTS chuan + Web Speech du phong)
        ========================================================= */
 
     let _cachedVoices = [];
     function loadVoices() {
       if (window.speechSynthesis) {
-        _cachedVoices = window.speechSynthesis.getVoices();
+        _cachedVoices = window.speechSynthesis.getVoices() || [];
       }
     }
     loadVoices();
@@ -1005,86 +1006,131 @@
       window.speechSynthesis.onvoiceschanged = loadVoices;
     }
 
+    // Mo khoa am thanh tren dien thoai va trinh duyet khi cham lan dau
+    function unlockAudioEngine() {
+      const a = document.getElementById('ttsAudio');
+      if (a) {
+        a.play().catch(function() {});
+        a.pause();
+      }
+      if (window.speechSynthesis) {
+        window.speechSynthesis.resume();
+      }
+    }
+    window.addEventListener('click', unlockAudioEngine, { once: true });
+    window.addEventListener('touchstart', unlockAudioEngine, { once: true });
+
     function findVietnameseVoice() {
       if (!_cachedVoices || _cachedVoices.length === 0) loadVoices();
-      // 1. Giọng nữ tự nhiên (Edge/Windows: HoaiMy, Mai)
+      if (!_cachedVoices) return null;
+
+      // 1. Uu tien giong nu tu nhien (HoaiMy, Mai, Linh, vi-VN)
       let v = _cachedVoices.find(voice => 
         (voice.lang === 'vi-VN' || voice.lang === 'vi') && 
-        (voice.name.includes('HoaiMy') || voice.name.includes('Natural') || voice.name.includes('Online'))
+        (voice.name.includes('HoaiMy') || voice.name.includes('Natural') || voice.name.includes('Online') || voice.name.includes('Linh'))
       );
       if (v) return v;
 
-      // 2. Bất kỳ giọng nữ tiếng Việt nào
+      // 2. Giong tieng Viet nu
       v = _cachedVoices.find(voice => 
         (voice.lang === 'vi-VN' || voice.lang === 'vi') && 
         !voice.name.toLowerCase().includes('male')
       );
       if (v) return v;
 
-      // 3. Bất kỳ giọng tiếng Việt nào (kể cả giọng Google tiếng Việt trong Chrome)
+      // 3. Bat ky giong tieng Viet nao
       v = _cachedVoices.find(voice => 
-        voice.lang === 'vi-VN' || voice.lang === 'vi' ||
-        voice.lang.toLowerCase().startsWith('vi') ||
-        voice.name.toLowerCase().includes('vietnam') ||
-        voice.name.toLowerCase().includes('tiếng việt')
+        (voice.lang && voice.lang.toLowerCase().replace('_', '-').startsWith('vi')) ||
+        (voice.name && (voice.name.toLowerCase().includes('vietnam') || voice.name.toLowerCase().includes('tiếng việt')))
       );
       return v || null;
     }
 
-    let _currentAudio = null;
+    function setBtnSpeakState(isSpeaking) {
+      const btn = document.getElementById('btnSpeak');
+      if (!btn) return;
+      if (isSpeaking) {
+        btn.textContent = '🔊 Đang đọc...';
+        btn.style.background = '#FFD600';
+      } else {
+        btn.textContent = '🔊 Nghe cô đọc';
+        btn.style.background = '';
+      }
+    }
 
     function speakVietnamese(text) {
       if (!text) return;
 
-      // Dừng âm thanh và giọng đọc cũ
-      if (_currentAudio) {
-        _currentAudio.pause();
-        _currentAudio.currentTime = 0;
-        _currentAudio = null;
-      }
+      const cleanText = text.replace(/[*#_~]/g, '').trim();
+      const safeText = cleanText.length > 150 ? cleanText.substring(0, 150) : cleanText;
+
+      // Dung bat ky giong dang doc
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
 
-      // Giới hạn độ dài an toàn cho TTS
-      const cleanText = text.replace(/[*#_~]/g, '').trim();
-      const safeText = cleanText.length > 150 ? cleanText.substring(0, 150) : cleanText;
+      setBtnSpeakState(true);
 
-      // Ưu tiên 1: Google Translate TTS trực tiếp (giọng nữ chuẩn tự nhiên 100%)
+      const audio = document.getElementById('ttsAudio') || new Audio();
+      audio.pause();
+      audio.currentTime = 0;
+
+      // Google TTS URL (KHONG DUNG crossOrigin de khong bi chan boi CORS)
       const googleUrl = 'https://translate.google.com/translate_tts?ie=UTF-8&tl=vi&client=tw-ob&q=' + encodeURIComponent(safeText);
-      const audio = new Audio();
-      audio.crossOrigin = 'anonymous';
+
+      let fallbackUsed = false;
+      function fallbackToWebSpeech() {
+        if (fallbackUsed) return;
+        fallbackUsed = true;
+        _speakWithWebSpeech(cleanText);
+      }
+
+      audio.onended = function() {
+        setBtnSpeakState(false);
+      };
+
+      audio.onerror = function() {
+        fallbackToWebSpeech();
+      };
+
       audio.src = googleUrl;
-      _currentAudio = audio;
 
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.catch(function(err) {
-          // Nếu Google TTS bị chặn trên trình duyệt/thiết bị này -> Dùng Web Speech API
-          _speakWithWebSpeech(cleanText);
+          fallbackToWebSpeech();
         });
       }
     }
 
     function _speakWithWebSpeech(text) {
-      if (!window.speechSynthesis) return;
-      window.speechSynthesis.cancel();
+      if (!window.speechSynthesis) {
+        setBtnSpeakState(false);
+        return;
+      }
 
-      const viVoice = findVietnameseVoice();
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.resume();
+
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'vi-VN';
       utterance.rate = 0.88;
       utterance.pitch = 1.05;
       utterance.volume = 1.0;
 
+      const viVoice = findVietnameseVoice();
       if (viVoice) {
         utterance.voice = viVoice;
-        window.speechSynthesis.speak(utterance);
-      } else {
-        // TUYỆT ĐỐI KHÔNG dùng giọng tiếng Anh mặc định để đọc tiếng Việt
-        // Thay vào đó chỉ phát âm khi trình duyệt có hỗ trợ tiếng Việt
-        console.warn('Không tìm thấy giọng tiếng Việt cục bộ trên thiết bị.');
       }
+
+      utterance.onend = function() {
+        setBtnSpeakState(false);
+      };
+      utterance.onerror = function() {
+        setBtnSpeakState(false);
+      };
+
+      window.speechSynthesis.speak(utterance);
     }
 
     /* =========================================================
