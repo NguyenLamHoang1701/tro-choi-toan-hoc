@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌈 Bé Vui Học Màu Sắc</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@1..144,1..1000&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Google Sans Flex', 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 30%, #98FB98 70%, #90EE90 100%);
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* ===== CLOUDS ===== */
+.cloud {
+    position: fixed;
+    background: rgba(255,255,255,0.85);
+    border-radius: 50px;
+    z-index: 0;
+    pointer-events: none;
+}
+.cloud::before, .cloud::after {
+    content: '';
+    position: absolute;
+    background: rgba(255,255,255,0.85);
+    border-radius: 50%;
+}
+.cloud-1 { width: 120px; height: 40px; top: 8%; animation: floatCloud 25s linear infinite; }
+.cloud-1::before { width: 50px; height: 50px; top: -25px; left: 20px; }
+.cloud-1::after { width: 70px; height: 55px; top: -20px; left: 50px; }
+.cloud-2 { width: 100px; height: 35px; top: 15%; animation: floatCloud 30s linear infinite 5s; }
+.cloud-2::before { width: 45px; height: 45px; top: -22px; left: 15px; }
+.cloud-2::after { width: 60px; height: 48px; top: -18px; left: 40px; }
+.cloud-3 { width: 90px; height: 30px; top: 5%; animation: floatCloud 35s linear infinite 12s; }
+.cloud-3::before { width: 40px; height: 40px; top: -20px; left: 10px; }
+.cloud-3::after { width: 55px; height: 42px; top: -16px; left: 35px; }
+
+@keyframes floatCloud {
+    0% { left: -200px; }
+    100% { left: 110vw; }
+}
+
+/* ===== FLOWERS ===== */
+.flowers-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    z-index: 0;
+    pointer-events: none;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    padding: 0 20px;
+}
+.flower {
+    font-size: 28px;
+    animation: swayFlower 3s ease-in-out infinite;
+}
+.flower:nth-child(even) { animation-delay: 0.5s; }
+.flower:nth-child(3n) { animation-delay: 1s; }
+
+@keyframes swayFlower {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+/* ===== TOP BAR ===== */
+.top-bar {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+}
+.logo { font-size: 1.3rem; font-weight: 700; color: #fff; text-shadow: 1px 2px 4px rgba(0,0,0,0.2); }
+.top-buttons { display: flex; gap: 8px; }
+.top-btn {
+    background: rgba(255,255,255,0.85);
+    border: none;
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    color: #4a6fa5;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.top-btn:hover { background: #fff; transform: scale(1.05); }
+.top-btn.active { background: #FFD700; color: #333; }
+
+/* ===== MAIN CONTAINER ===== */
+.main-container {
+    position: relative;
+    z-index: 5;
+    max-width: 600px;
+    margin: 10px auto 80px;
+    background: rgba(240, 252, 255, 0.95);
+    border-radius: 30px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    padding: 30px 24px;
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== HOME SCREEN ===== */
+.home-icons { text-align: center; font-size: 2.5rem; margin-bottom: 10px; letter-spacing: 8px; }
+.home-title { text-align: center; font-size: 1.8rem; font-weight: 800; color: #FF6B6B; margin-bottom: 8px; }
+.home-desc { text-align: center; font-size: 1rem; color: #666; margin-bottom: 20px; line-height: 1.5; }
+
+.color-preview {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+.color-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.color-circle-preview {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: transform 0.3s;
+}
+.color-circle-preview:hover { transform: scale(1.15); }
+.color-label { font-size: 0.95rem; font-weight: 700; }
+
+.home-hint { text-align: center; font-size: 0.9rem; color: #888; margin: 18px 0 10px; font-style: italic; }
+
+.start-btn {
+    display: block;
+    margin: 20px auto 10px;
+    background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    padding: 16px 48px;
+    font-size: 1.25rem;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 16px rgba(255,107,107,0.4);
+}
+.start-btn:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(255,107,107,0.5); }
+.start-btn:active { transform: scale(0.97); }
+
+.home-footer { text-align: center; font-size: 0.8rem; color: #aaa; margin-top: 12px; }
+
+/* ===== GAME SCREEN ===== */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.question-num { font-size: 0.95rem; font-weight: 700; color: #4a6fa5; }
+.score-display { font-size: 0.95rem; font-weight: 700; color: #FFB800; }
+
+.progress-bar-container {
+    background: #e0e8f0;
+    border-radius: 10px;
+    height: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4FC3F7, #29B6F6, #03A9F4);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.question-area { text-align: center; margin-bottom: 10px; }
+.question-text {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 16px;
+    line-height: 1.4;
+}
+.question-illustration {
+    font-size: 5rem;
+    margin: 10px 0 20px;
+    animation: bounceIn 0.5s ease;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.answers-row {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin: 20px 0;
+}
+.answer-btn {
+    width: 120px;
+    height: 120px;
+    border-radius: 25px;
+    border: 4px solid #e0e8f0;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.answer-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.18); }
+.answer-btn:active { transform: scale(0.95); }
+.answer-btn .inner-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.answer-btn.correct {
+    border-color: #4CAF50;
+    background: rgba(76,175,80,0.15);
+    animation: pulseCorrect 0.5s ease;
+}
+.answer-btn.wrong {
+    border-color: #FF9800;
+    background: rgba(255,152,0,0.12);
+    animation: shakeWrong 0.4s ease;
+}
+
+@keyframes pulseCorrect {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+@keyframes shakeWrong {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+}
+
+.feedback-area {
+    text-align: center;
+    min-height: 60px;
+    margin: 10px 0;
+}
+.feedback-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    animation: fadeInUp 0.4s ease;
+}
+.feedback-text.correct-feedback { color: #4CAF50; }
+.feedback-text.wrong-feedback { color: #FF9800; }
+
+.next-btn {
+    display: none;
+    margin: 10px auto 0;
+    background: linear-gradient(135deg, #4FC3F7, #29B6F6);
+    color: #fff;
+    border: none;
+    border-radius: 22px;
+    padding: 14px 40px;
+    font-size: 1.1rem;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 14px rgba(41,182,246,0.4);
+}
+.next-btn:hover { transform: scale(1.06); }
+
+/* ===== RESULT SCREEN ===== */
+.result-emojis { text-align: center; font-size: 3rem; margin-bottom: 10px; letter-spacing: 10px; }
+.result-title { text-align: center; font-size: 1.8rem; font-weight: 800; color: #FF6B6B; margin-bottom: 8px; }
+.result-desc { text-align: center; font-size: 1rem; color: #555; margin-bottom: 16px; }
+.result-score {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #FFB800;
+    margin: 16px 0;
+}
+.result-buttons { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 20px; }
+.replay-btn {
+    background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    padding: 14px 44px;
+    font-size: 1.15rem;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 16px rgba(255,107,107,0.35);
+}
+.replay-btn:hover { transform: scale(1.06); }
+.home-btn {
+    background: rgba(255,255,255,0.9);
+    color: #4a6fa5;
+    border: 2px solid #4a6fa5;
+    border-radius: 25px;
+    padding: 12px 40px;
+    font-size: 1rem;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.home-btn:hover { background: #4a6fa5; color: #fff; }
+
+/* ===== STARS EFFECT ===== */
+.stars-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 100;
+}
+.star-particle {
+    position: absolute;
+    font-size: 1.5rem;
+    animation: starFall 1.2s ease-out forwards;
+    pointer-events: none;
+}
+@keyframes starFall {
+    0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+    100% { opacity: 0; transform: translateY(120px) scale(0.3) rotate(360deg); }
+}
+
+/* ===== HIDDEN ===== */
+.hidden { display: none !important; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+    .main-container { margin: 8px 12px 80px; padding: 22px 16px; border-radius: 24px; }
+    .home-title, .result-title { font-size: 1.45rem; }
+    .question-text { font-size: 1.15rem; }
+    .question-illustration { font-size: 4rem; }
+    .answer-btn { width: 105px; height: 105px; border-radius: 22px; }
+    .answer-btn .inner-circle { width: 68px; height: 68px; }
+    .answers-row { gap: 18px; }
+    .color-circle-preview { width: 58px; height: 58px; }
+    .top-btn { padding: 6px 10px; font-size: 0.78rem; }
+    .logo { font-size: 1.1rem; }
+    .start-btn { padding: 14px 36px; font-size: 1.1rem; }
+}
+
+@media (max-width: 380px) {
+    .answer-btn { width: 90px; height: 90px; }
+    .answer-btn .inner-circle { width: 58px; height: 58px; }
+    .question-illustration { font-size: 3.2rem; }
+    .top-buttons { gap: 4px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Clouds -->
+<div class="cloud cloud-1"></div>
+<div class="cloud cloud-2"></div>
+<div class="cloud cloud-3"></div>
+
+<!-- Flowers -->
+<div class="flowers-container">
+    <span class="flower">🌸</span>
+    <span class="flower">🌻</span>
+    <span class="flower">🌷</span>
+    <span class="flower">🌼</span>
+    <span class="flower">🌺</span>
+    <span class="flower">🌸</span>
+    <span class="flower">🌻</span>
+    <span class="flower">🌷</span>
+</div>
+
+<!-- Stars container for effects -->
+<div class="stars-container" id="starsContainer"></div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+    <div class="logo">🌈 BÉ VUI HỌC MÀU SẮC</div>
+    <div class="top-buttons">
+        <button class="top-btn" id="btnMusic" onclick="toggleMusic()">🎵 Nhạc nền</button>
+        <button class="top-btn" id="btnSpeak" onclick="speakCurrent()">🔊 Nghe cô đọc</button>
+    </div>
+</div>
+
+<!-- ========== HOME SCREEN ========== -->
+<div class="main-container" id="screenHome">
+    <div class="home-icons">🍎 🔵 🟡 🔴 🧸</div>
+    <div class="home-title">BÉ VUI HỌC MÀU SẮC</div>
+    <div class="home-desc">Bé cùng cô khám phá những màu sắc thật vui nhé!</div>
+
+    <div class="color-preview">
+        <div class="color-item">
+            <div class="color-circle-preview" style="background: #EF4444;"></div>
+            <span class="color-label" style="color:#EF4444;">ĐỎ</span>
+        </div>
+        <div class="color-item">
+            <div class="color-circle-preview" style="background: #3B82F6;"></div>
+            <span class="color-label" style="color:#3B82F6;">XANH DƯƠNG</span>
+        </div>
+        <div class="color-item">
+            <div class="color-circle-preview" style="background: #FBBF24;"></div>
+            <span class="color-label" style="color:#FBBF24;">VÀNG</span>
+        </div>
+    </div>
+
+    <div class="home-hint">Bé hãy nhìn thật kỹ và chọn màu giống với cô nhé!</div>
+
+    <button class="start-btn" onclick="startGame()">BẮT ĐẦU CHƠI ▶</button>
+
+    <div class="home-footer">Dành cho các bé 2–3 tuổi</div>
+</div>
+
+<!-- ========== GAME SCREEN ========== -->
+<div class="main-container hidden" id="screenGame">
+    <div class="game-header">
+        <span class="question-num" id="questionNum">Câu 1/10</span>
+        <span class="score-display" id="scoreDisplay">⭐ Điểm: 0</span>
+    </div>
+    <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progressBar" style="width: 10%;"></div>
+    </div>
+    <div class="question-area">
+        <div class="question-text" id="questionText"></div>
+        <div class="question-illustration" id="questionIllustration"></div>
+    </div>
+    <div class="answers-row" id="answersRow"></div>
+    <div class="feedback-area" id="feedbackArea"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">CÂU TIẾP THEO ➜</button>
+</div>
+
+<!-- ========== RESULT SCREEN ========== -->
+<div class="main-container hidden" id="screenResult">
+    <div class="result-emojis">🎉🎉🎉</div>
+    <div class="result-title">CHÚC MỪNG BÉ!</div>
+    <div class="result-desc">Bé đã nhận biết được các màu sắc thật giỏi!</div>
+    <div class="result-score" id="resultScore">⭐ Điểm của bé: 0/10</div>
+    <div class="result-buttons">
+        <button class="replay-btn" onclick="restartGame()">CHƠI LẠI 🔄</button>
+        <button class="home-btn" onclick="goHome()">VỀ TRANG CHỦ 🏠</button>
+    </div>
+</div>
+
+<script>
+// ===== DATA =====
+const COLORS = {
+    red:  { name: 'đỏ', hex: '#EF4444', label: 'ĐỎ' },
+    blue: { name: 'xanh dương', hex: '#3B82F6', label: 'XANH DƯƠNG' },
+    yellow: { name: 'vàng', hex: '#FBBF24', label: 'VÀNG' }
+};
+
+const ITEMS = {
+    red: [
+        { emoji: '🍎', desc: 'Quả táo' },
+        { emoji: '🍓', desc: 'Quả dâu' },
+        { emoji: '❤️', desc: 'Trái tim' },
+        { emoji: '🚗', desc: 'Chiếc ô tô' }
+    ],
+    blue: [
+        { emoji: '🫐', desc: 'Quả việt quất' },
+        { emoji: '🔵', desc: 'Hình tròn xanh dương' },
+        { emoji: '🐟', desc: 'Con cá' },
+        { emoji: '🚙', desc: 'Chiếc ô tô' }
+    ],
+    yellow: [
+        { emoji: '🍌', desc: 'Quả chuối' },
+        { emoji: '🌟', desc: 'Ngôi sao' },
+        { emoji: '☀️', desc: 'Mặt trời' },
+        { emoji: '🐥', desc: 'Chú vịt' }
+    ]
+};
+
+const QUESTION_TEMPLATES = [
+    (item, color) => `Bé hãy chọn màu ${color.name} nhé!`,
+    (item, color) => `${item.desc} có màu gì?`,
+    (item, color) => `Đây là màu gì?`,
+    (item, color) => `Bé hãy tìm màu ${color.name}!`
+];
+
+const PRAISE = [
+    'Ôi, bé giỏi quá!',
+    'Đúng rồi, bé yêu!',
+    'Bé chọn đúng rồi!',
+    'Cô khen bé nào!',
+    'Hoan hô bé!'
+];
+
+// ===== STATE =====
+let questions = [];
+let currentQ = 0;
+let score = 0;
+let answered = false;
+let musicPlaying = false;
+let audioCtx = null;
+let musicGain = null;
+let musicSource = null;
+let currentSpeakText = '';
+
+// ===== UTILS =====
+function shuffleArray(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function pickRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// ===== QUESTION GENERATION =====
+function generateQuestions() {
+    const colorKeys = ['red', 'blue', 'yellow'];
+    const qList = [];
+
+    // Ensure at least 3 of each color (9 total), then 1 random
+    let colorPool = [];
+    colorKeys.forEach(c => { colorPool.push(c, c, c); });
+    colorPool.push(pickRandom(colorKeys));
+    colorPool = shuffleArray(colorPool);
+
+    // Avoid same color consecutively
+    for (let attempt = 0; attempt < 50; attempt++) {
+        let ok = true;
+        for (let i = 1; i < colorPool.length; i++) {
+            if (colorPool[i] === colorPool[i - 1]) { ok = false; break; }
+        }
+        if (ok) break;
+        colorPool = shuffleArray(colorPool);
+    }
+
+    for (let i = 0; i < 10; i++) {
+        const correctColorKey = colorPool[i];
+        const correctColor = COLORS[correctColorKey];
+        const item = pickRandom(ITEMS[correctColorKey]);
+        const template = pickRandom(QUESTION_TEMPLATES);
+        const questionText = template(item, correctColor);
+
+        // Pick a wrong color
+        const wrongKeys = colorKeys.filter(k => k !== correctColorKey);
+        const wrongColorKey = pickRandom(wrongKeys);
+        const wrongColor = COLORS[wrongColorKey];
+
+        // Randomize answer positions
+        const answers = shuffleArray([
+            { colorKey: correctColorKey, color: correctColor, isCorrect: true },
+            { colorKey: wrongColorKey, color: wrongColor, isCorrect: false }
+        ]);
+
+        qList.push({ questionText, item, correctColor, correctColorKey, answers });
+    }
+
+    return qList;
+}
+
+// ===== SCREENS =====
+function showScreen(id) {
+    document.getElementById('screenHome').classList.add('hidden');
+    document.getElementById('screenGame').classList.add('hidden');
+    document.getElementById('screenResult').classList.add('hidden');
+    document.getElementById(id).classList.remove('hidden');
+}
+
+// ===== GAME FLOW =====
+function startGame() {
+    questions = generateQuestions();
+    currentQ = 0;
+    score = 0;
+    showScreen('screenGame');
+    renderQuestion();
+    speakVietnamese(questions[currentQ].questionText);
+}
+
+function renderQuestion() {
+    const q = questions[currentQ];
+    answered = false;
+
+    document.getElementById('questionNum').textContent = `Câu ${currentQ + 1}/10`;
+    document.getElementById('scoreDisplay').textContent = `⭐ Điểm: ${score}`;
+    document.getElementById('progressBar').style.width = `${(currentQ + 1) * 10}%`;
+    document.getElementById('questionText').textContent = q.questionText;
+    document.getElementById('questionIllustration').textContent = q.item.emoji;
+    document.getElementById('feedbackArea').innerHTML = '';
+    document.getElementById('nextBtn').style.display = 'none';
+
+    currentSpeakText = q.questionText;
+
+    const row = document.getElementById('answersRow');
+    row.innerHTML = '';
+    q.answers.forEach((ans, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.innerHTML = `<div class="inner-circle" style="background:${ans.color.hex};"></div>`;
+        btn.onclick = () => checkAnswer(idx, btn);
+        row.appendChild(btn);
+    });
+
+    // Re-trigger animation
+    const illEl = document.getElementById('questionIllustration');
+    illEl.style.animation = 'none';
+    void illEl.offsetHeight;
+    illEl.style.animation = 'bounceIn 0.5s ease';
+}
+
+function checkAnswer(idx, btn) {
+    if (answered) return;
+    const q = questions[currentQ];
+    const ans = q.answers[idx];
+
+    if (ans.isCorrect) {
+        answered = true;
+        score++;
+        btn.classList.add('correct');
+        document.getElementById('scoreDisplay').textContent = `⭐ Điểm: ${score}`;
+
+        // Disable other button
+        const btns = document.querySelectorAll('.answer-btn');
+        btns.forEach(b => b.onclick = null);
+
+        // Show feedback
+        const praise = pickRandom(PRAISE);
+        document.getElementById('feedbackArea').innerHTML =
+            `<div class="feedback-text correct-feedback">🎉 Chính xác, bé giỏi quá!</div>`;
+
+        // Stars effect
+        spawnStars(btn);
+
+        // Play sound
+        playCorrectSound();
+
+        // Speak praise
+        speakVietnamese(`Chính xác, bé giỏi quá! ${praise}`);
+
+        // Show next button
+        document.getElementById('nextBtn').style.display = 'block';
+
+    } else {
+        btn.classList.add('wrong');
+
+        document.getElementById('feedbackArea').innerHTML =
+            `<div class="feedback-text wrong-feedback">Bé thử lại nhé! 💪</div>`;
+
+        playWrongSound();
+        speakVietnamese('Bé thử lại nhé!');
+
+        // Allow retry: remove wrong class after animation
+        setTimeout(() => { btn.classList.remove('wrong'); }, 600);
+    }
+}
+
+function nextQuestion() {
+    currentQ++;
+    if (currentQ >= 10) {
+        showResult();
+    } else {
+        renderQuestion();
+        speakVietnamese(questions[currentQ].questionText);
+    }
+}
+
+function showResult() {
+    showScreen('screenResult');
+    document.getElementById('resultScore').textContent = `⭐ Điểm của bé: ${score}/10`;
+
+    // Big star burst
+    for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+            spawnStarAt(Math.random() * window.innerWidth, Math.random() * window.innerHeight * 0.6);
+        }, i * 80);
+    }
+
+    playCorrectSound();
+    speakVietnamese('Chúc mừng bé! Bé học màu sắc thật giỏi!');
+}
+
+function restartGame() {
+    startGame();
+}
+
+function goHome() {
+    stopAllSpeech();
+    showScreen('screenHome');
+}
+
+// ===== SPEECH SYNTHESIS & TTS AUDIO (HYBRID & ROBUST) =====
+let voicesList = [];
+let activeUtterance = null;
+let currentTtsAudio = null;
+
+function populateVoices() {
+    if (typeof window.speechSynthesis !== 'undefined') {
+        voicesList = window.speechSynthesis.getVoices();
+    }
+}
+populateVoices();
+if (typeof window.speechSynthesis !== 'undefined') {
+    window.speechSynthesis.onvoiceschanged = populateVoices;
+}
+
+function findViVoice() {
+    if (!voicesList || voicesList.length === 0) populateVoices();
+    return voicesList.find(v => 
+        (v.lang && (v.lang === 'vi-VN' || v.lang === 'vi_VN' || v.lang.toLowerCase().startsWith('vi'))) ||
+        (v.name && /vietnam|tiếng việt/i.test(v.name))
+    );
+}
+
+function updateSpeakingUI(isSpeaking) {
+    const btn = document.getElementById('btnSpeak');
+    if (btn) {
+        if (isSpeaking) {
+            btn.classList.add('active');
+            btn.textContent = '🔊 Đang đọc...';
+        } else {
+            btn.classList.remove('active');
+            btn.textContent = '🔊 Nghe cô đọc';
+        }
+    }
+}
+
+function stopAllSpeech() {
+    if (currentTtsAudio) {
+        try {
+            currentTtsAudio.pause();
+            currentTtsAudio.currentTime = 0;
+        } catch (e) {}
+        currentTtsAudio = null;
+    }
+    if (typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis) {
+        try {
+            window.speechSynthesis.cancel();
+        } catch (e) {}
+    }
+    activeUtterance = null;
+    updateSpeakingUI(false);
+}
+
+function speakVietnamese(text, onEnd) {
+    if (!text) return;
+    stopAllSpeech();
+
+    const viVoice = findViVoice();
+
+    // 1. If native Vietnamese voice exists on this machine, use Web Speech API
+    if (viVoice) {
+        updateSpeakingUI(true);
+        setTimeout(() => {
+            try {
+                if (window.speechSynthesis.paused) {
+                    window.speechSynthesis.resume();
+                }
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.voice = viVoice;
+                utter.lang = 'vi-VN';
+                utter.rate = 0.88;
+                utter.pitch = 1.05;
+
+                activeUtterance = utter; // Prevent Chrome garbage collection bug
+
+                utter.onend = () => {
+                    activeUtterance = null;
+                    updateSpeakingUI(false);
+                    if (onEnd) onEnd();
+                };
+
+                utter.onerror = (err) => {
+                    activeUtterance = null;
+                    updateSpeakingUI(false);
+                    // Automatic fallback if Web Speech encountered an error
+                    playAudioTTS(text, onEnd);
+                };
+
+                window.speechSynthesis.speak(utter);
+            } catch (e) {
+                playAudioTTS(text, onEnd);
+            }
+        }, 30);
+    } else {
+        // 2. If system has NO Vietnamese voice pack (common on Windows), use Google natural Vietnamese TTS Audio
+        playAudioTTS(text, onEnd);
+    }
+}
+
+function playAudioTTS(text, onEnd) {
+    updateSpeakingUI(true);
+    try {
+        const encoded = encodeURIComponent(text);
+        const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=vi&client=tw-ob&q=${encoded}`;
+        const audio = new Audio(url);
+        currentTtsAudio = audio;
+
+        audio.onended = () => {
+            currentTtsAudio = null;
+            updateSpeakingUI(false);
+            if (onEnd) onEnd();
+        };
+
+        audio.onerror = () => {
+            currentTtsAudio = null;
+            updateSpeakingUI(false);
+            // Last resort: default speech synthesis
+            if (window.speechSynthesis) {
+                try {
+                    const utter = new SpeechSynthesisUtterance(text);
+                    utter.lang = 'vi-VN';
+                    utter.rate = 0.85;
+                    utter.onend = () => { if (onEnd) onEnd(); };
+                    window.speechSynthesis.speak(utter);
+                } catch(e) {
+                    if (onEnd) onEnd();
+                }
+            } else {
+                if (onEnd) onEnd();
+            }
+        };
+
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(err => {
+                currentTtsAudio = null;
+                updateSpeakingUI(false);
+                if (window.speechSynthesis) {
+                    try {
+                        const utter = new SpeechSynthesisUtterance(text);
+                        utter.lang = 'vi-VN';
+                        utter.rate = 0.85;
+                        utter.onend = () => { if (onEnd) onEnd(); };
+                        window.speechSynthesis.speak(utter);
+                    } catch(e) {
+                        if (onEnd) onEnd();
+                    }
+                } else {
+                    if (onEnd) onEnd();
+                }
+            });
+        }
+    } catch (e) {
+        currentTtsAudio = null;
+        updateSpeakingUI(false);
+        if (onEnd) onEnd();
+    }
+}
+
+function speakCurrent() {
+    const homeScreen = document.getElementById('screenHome');
+    const gameScreen = document.getElementById('screenGame');
+    const resultScreen = document.getElementById('screenResult');
+
+    if (!homeScreen.classList.contains('hidden')) {
+        speakVietnamese('Bé cùng cô khám phá những màu sắc thật vui nhé!');
+    } else if (!gameScreen.classList.contains('hidden')) {
+        if (currentSpeakText) speakVietnamese(currentSpeakText);
+    } else if (!resultScreen.classList.contains('hidden')) {
+        speakVietnamese('Chúc mừng bé! Bé học màu sắc thật giỏi!');
+    }
+}
+
+// ===== BACKGROUND MUSIC (Web Audio API) =====
+function initAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    musicGain = audioCtx.createGain();
+    musicGain.gain.value = 0.12;
+    musicGain.connect(audioCtx.destination);
+}
+
+function createMelody() {
+    // Simple cheerful melody using oscillators
+    const notes = [
+        { freq: 523.25, dur: 0.35 }, // C5
+        { freq: 587.33, dur: 0.35 }, // D5
+        { freq: 659.25, dur: 0.35 }, // E5
+        { freq: 523.25, dur: 0.35 }, // C5
+        { freq: 659.25, dur: 0.35 }, // E5
+        { freq: 587.33, dur: 0.35 }, // D5
+        { freq: 523.25, dur: 0.7  }, // C5
+        { freq: 392.00, dur: 0.35 }, // G4
+        { freq: 440.00, dur: 0.35 }, // A4
+        { freq: 493.88, dur: 0.35 }, // B4
+        { freq: 523.25, dur: 0.35 }, // C5
+        { freq: 493.88, dur: 0.35 }, // B4
+        { freq: 440.00, dur: 0.35 }, // A4
+        { freq: 392.00, dur: 0.7  }, // G4
+        { freq: 329.63, dur: 0.35 }, // E4
+        { freq: 349.23, dur: 0.35 }, // F4
+        { freq: 392.00, dur: 0.35 }, // G4
+        { freq: 440.00, dur: 0.35 }, // A4
+        { freq: 493.88, dur: 0.35 }, // B4
+        { freq: 523.25, dur: 0.7  }, // C5
+    ];
+    return notes;
+}
+
+let melodyTimeout = null;
+let melodyPlaying = false;
+
+function playMelodyLoop() {
+    if (!melodyPlaying || !audioCtx) return;
+    const notes = createMelody();
+    let time = audioCtx.currentTime;
+    notes.forEach(n => {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = n.freq;
+        g.gain.setValueAtTime(0, time);
+        g.gain.linearRampToValueAtTime(0.15, time + 0.05);
+        g.gain.linearRampToValueAtTime(0, time + n.dur - 0.05);
+        osc.connect(g);
+        g.connect(musicGain);
+        osc.start(time);
+        osc.stop(time + n.dur);
+        time += n.dur;
+    });
+    const totalDur = notes.reduce((s, n) => s + n.dur, 0);
+    melodyTimeout = setTimeout(() => playMelodyLoop(), totalDur * 1000 + 500);
+}
+
+function toggleMusic() {
+    initAudio();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    melodyPlaying = !melodyPlaying;
+    musicPlaying = melodyPlaying;
+    const btn = document.getElementById('btnMusic');
+
+    if (melodyPlaying) {
+        btn.classList.add('active');
+        btn.textContent = '🎵 Tắt nhạc';
+        playMelodyLoop();
+    } else {
+        btn.classList.remove('active');
+        btn.textContent = '🎵 Nhạc nền';
+        clearTimeout(melodyTimeout);
+    }
+}
+
+// ===== SOUND EFFECTS =====
+function playCorrectSound() {
+    try {
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        [660, 880, 1100].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            g.gain.setValueAtTime(0.2, now + i * 0.12);
+            g.gain.linearRampToValueAtTime(0, now + i * 0.12 + 0.3);
+            osc.connect(g);
+            g.connect(audioCtx.destination);
+            osc.start(now + i * 0.12);
+            osc.stop(now + i * 0.12 + 0.3);
+        });
+    } catch(e) {}
+}
+
+function playWrongSound() {
+    try {
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.value = 300;
+        g.gain.setValueAtTime(0.15, now);
+        g.gain.linearRampToValueAtTime(0, now + 0.3);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.3);
+    } catch(e) {}
+}
+
+// ===== STAR EFFECTS =====
+function spawnStars(anchorEl) {
+    const rect = anchorEl.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+            spawnStarAt(cx + (Math.random() - 0.5) * 120, cy + (Math.random() - 0.5) * 80);
+        }, i * 60);
+    }
+}
+
+function spawnStarAt(x, y) {
+    const container = document.getElementById('starsContainer');
+    const star = document.createElement('div');
+    star.className = 'star-particle';
+    star.textContent = pickRandom(['⭐', '🌟', '✨', '💫']);
+    star.style.left = x + 'px';
+    star.style.top = y + 'px';
+    container.appendChild(star);
+    setTimeout(() => star.remove(), 1300);
+}
+
+// ===== PLAYBACK MUSIC (via audio context) =====
+function playBackgroundMusic() {
+    toggleMusic();
+}
+</script>
+
+</body>
+</html>
